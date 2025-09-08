@@ -37,3 +37,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully", "user_id": user.ID})
 }
+
+func (h *UserHandler) Me(c *gin.Context) {
+	c.String(http.StatusOK, "ok")
+}

@@ -2,6 +2,7 @@ package app
 
 import (
 	"chin_server/internal/handler"
+	"chin_server/internal/middleware"
 	"chin_server/internal/repository"
 	"chin_server/internal/service"
 
@@ -19,10 +20,23 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// 3. Khởi tạo handler (cần service)
 	userHandler := handler.NewUserHandler(userService)
 
-	// 4. Đăng ký route
-	api := r.Group("/api/v1")
+	// 4. Middleware
+	authMiddleware := middleware.AuthMiddleware(userService)
+
+	// Public routes (không cần token)
+	public := r.Group("/api/v1")
 	{
-		api.POST("/register", userHandler.Register)
+		public.POST("/register", userHandler.Register)
+		public.POST("/login", authMiddleware.LoginHandler)
+		public.GET("/refresh_token", authMiddleware.RefreshHandler)
 	}
+
+	// Protected routes (cần token)
+	protected := r.Group("/api/v1")
+	protected.Use(authMiddleware.MiddlewareFunc())
+	{
+		protected.GET("/me", userHandler.Me)
+	}
+
 	return r
 }

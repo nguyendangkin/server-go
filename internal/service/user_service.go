@@ -48,3 +48,11 @@ func (s *UserService) Register(email, password, name string) (*model.User, error
 
 	return user, nil
 }
+
+func (s *UserService) GetUserByID(id uint) (*model.User, error) {
+	return s.repo.GetUserByID(id)
+}
+
+func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
+	return s.repo.GetUserByEmail(email)
+}
