@@ -8,6 +8,7 @@ type User struct {
 	Username  string    `gorm:"unique;not null"` // tên đăng nhập, duy nhất
 	Email     string    `gorm:"unique;not null"` // email, duy nhất
 	Password  string    `gorm:"not null"`        // hash, không lưu raw text
+	Role      string    `gorm:"not null;default:'user'"`
 	CreatedAt time.Time // gorm tự quản lý
 	UpdatedAt time.Time // gorm tự quản lý
 }

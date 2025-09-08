@@ -20,10 +20,10 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// 3. Khởi tạo handler (cần service)
 	userHandler := handler.NewUserHandler(userService)
 
-	// 4. Middleware
+	// 4. Middleware cơ bản check token
 	authMiddleware := middleware.AuthMiddleware(userService)
 
-	// Public routes (không cần token)
+	// Public routes
 	public := r.Group("/api/v1")
 	{
 		public.POST("/register", userHandler.Register)
@@ -35,7 +35,24 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	protected := r.Group("/api/v1")
 	protected.Use(authMiddleware.MiddlewareFunc())
 	{
+		// cho cả user và admin
 		protected.GET("/me", userHandler.Me)
+
+		// chỉ user thường
+		userRoutes := protected.Group("/user")
+		userRoutes.Use(middleware.UserOnly())
+		{
+			userRoutes.GET("/profile", userHandler.User)
+		}
+
+		// chỉ dành cho admin
+		adminRoutes := protected.Group("/admin")
+		adminRoutes.Use(middleware.AdminOnly())
+		{
+
+			adminRoutes.GET("/dashboard", userHandler.Admin)
+
+		}
 	}
 
 	return r

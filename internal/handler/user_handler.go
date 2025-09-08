@@ -38,6 +38,17 @@ func (h *UserHandler) Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully", "user_id": user.ID})
 }
 
+// route protect của user và admin (tóm lại là cho người dùng đã xác thực)
 func (h *UserHandler) Me(c *gin.Context) {
-	c.String(http.StatusOK, "ok")
+	c.String(http.StatusOK, "ok admin and user")
+}
+
+// route protect của admin
+func (h *UserHandler) Admin(c *gin.Context) {
+	c.String(http.StatusOK, "ok admin")
+}
+
+// route protect của user
+func (h *UserHandler) User(c *gin.Context) {
+	c.String(http.StatusOK, "ok user")
 }

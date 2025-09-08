@@ -34,6 +34,7 @@ func (r *UserRepository) GetUserByEmail(email string) (*model.User, error) {
 	return &user, nil
 }
 
+// get user bởi id
 func (r *UserRepository) GetUserByID(id uint) (*model.User, error) {
 	var user model.User
 	err := r.db.First(&user, id).Error

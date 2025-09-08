@@ -22,7 +22,7 @@ func AuthMiddleware(userService *service.UserService) *jwt.GinJWTMiddleware {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte("your_very_secret_key"), // ⚠️ Đổi thành key thật, lưu ở env/config
-		Timeout:     time.Second * 20,
+		Timeout:     time.Second * 60,
 		MaxRefresh:  time.Minute * 5,
 		IdentityKey: identityKey,
 
@@ -59,11 +59,13 @@ func AuthMiddleware(userService *service.UserService) *jwt.GinJWTMiddleware {
 				return "", jwt.ErrMissingLoginValues
 			}
 
+			// gọi xuống db lấy user
 			user, err := userService.GetUserByEmail(loginVals.Email)
 			if err != nil || user == nil {
 				return nil, jwt.ErrFailedAuthentication
 			}
 
+			// so sánh mật khẩu
 			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginVals.Password))
 			if err != nil {
 				return nil, jwt.ErrFailedAuthentication
@@ -75,7 +77,7 @@ func AuthMiddleware(userService *service.UserService) *jwt.GinJWTMiddleware {
 		// kiểm tra quyền truy cập của người dùng
 		Authorizator: func(data interface{}, c *gin.Context) bool {
 			if _, ok := data.(*model.User); ok {
-				return true
+				return true // chỉ cần user hợp lệ
 			}
 			return false
 		},
